@@ -1,0 +1,9 @@
+# Окончания строк: .bat обязаны быть CRLF, иначе cmd.exe путается в метках и многострочных блоках
+*.bat text eol=crlf
+*.cmd text eol=crlf
+* text=auto
+*.vrm binary
+*.vrma binary
+*.png binary
+*.jpg binary
+*.ico binary

@@ -1,0 +1,203 @@
+/* src/neko/styles/neko.css
+   Стили NEKO: главное окно с аватаром + общая «оболочка» дополнительных окон (чат, настройки, дневник).
+   Цвета берутся из переменных темы (base.css), поэтому светлая тема и «Прозрачность окон» работают везде. */
+
+:root {
+  --neko-accent: #9b7bb8;
+  --neko-warm: #d4af37;
+  --neko-pink: #e8a4c8;
+}
+
+/* ───────────── Главное окно NEKO ───────────── */
+.neko-root {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 22px 12px 14px;
+  background: transparent;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Язычок для перетаскивания окна */
+.neko-drag-handle,
+.drag-strip {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  -webkit-app-region: drag;
+  border-radius: 8px;
+  background: rgba(var(--card-rgb), 0.7);
+  border: 1px solid var(--panel-border);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background 0.2s, border-color 0.2s;
+  z-index: 5;
+}
+.neko-drag-handle:hover,
+.drag-strip:hover {
+  background: var(--active-bg);
+  border-color: var(--accent-purple);
+}
+.neko-drag-handle:active,
+.drag-strip:active { cursor: grabbing; }
+
+.neko-drag-grip,
+.drag-grip {
+  width: 24px;
+  height: 2px;
+  background: var(--text-secondary);
+  border-radius: 2px;
+  box-shadow: 0 4px 0 var(--text-secondary);
+}
+
+/* Модель */
+.neko-avatar {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  background: transparent;
+  -webkit-app-region: no-drag;
+}
+
+/* Плашка статуса дневника */
+.neko-pill {
+  position: absolute;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  white-space: nowrap;
+  color: var(--text-primary);
+  background: rgba(var(--card-rgb), 0.9);
+  border: 1px solid var(--panel-border);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 4;
+  pointer-events: none;
+}
+.pill-enter-active, .pill-leave-active { transition: opacity 0.3s, transform 0.3s; }
+.pill-enter-from, .pill-leave-to { opacity: 0; transform: translate(-50%, -6px); }
+
+/* Кнопки под моделью */
+.neko-buttons {
+  display: flex;
+  gap: 8px;
+  -webkit-app-region: no-drag;
+}
+.neko-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(var(--card-rgb), 0.88);
+  border: 1px solid var(--panel-border);
+  color: var(--text-primary);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+.neko-btn:hover {
+  transform: translateY(-2px) scale(1.06);
+  background: var(--active-bg);
+  border-color: var(--accent-purple);
+}
+.neko-btn:active { transform: scale(0.94); }
+.neko-btn.close:hover {
+  background: rgba(255, 68, 68, 0.22);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.neko-btn .badge {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--neko-pink);
+  border: 2px solid rgba(var(--card-rgb), 1);
+  animation: pulse-mic 1.8s infinite;
+}
+.neko-btn.busy { animation: pulse-mic 1.6s infinite; }
+
+/* ───────────── Оболочка дополнительных окон ───────────── */
+.win-root {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  padding: 18px 8px 8px;
+  position: relative;
+  overflow: hidden;
+}
+.drag-strip { width: 70px; top: 4px; }
+.drag-grip { width: 28px; }
+
+.window-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: rgba(var(--card-rgb), var(--card-alpha));
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  -webkit-app-region: no-drag;
+}
+.window-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(var(--head-rgb), 0.9);
+  border-bottom: 1px solid var(--panel-border);
+  flex-shrink: 0;
+}
+.window-head .title {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--text-primary);
+}
+.window-head .title.center { text-align: center; }
+.window-head .close-btn,
+.window-head .back-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  min-width: 28px;
+}
+.window-head .back-btn:hover { background: var(--hover-bg); color: var(--text-primary); }
+.window-head .close-btn:hover { background: rgba(255, 68, 68, 0.18); color: var(--danger); }
+.window-body { flex: 1; min-height: 0; overflow: hidden; display: flex; }
+.window-body > * { flex: 1; min-width: 0; }
+.window-body.scroll { overflow-y: auto; flex-direction: column; }

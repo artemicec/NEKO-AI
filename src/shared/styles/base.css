@@ -1,0 +1,170 @@
+html, body, #app {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: transparent !important;
+  overflow: hidden;
+  font-family: 'Segoe UI', -apple-system, system-ui, sans-serif;
+  color: var(--text-primary);
+  user-select: none;
+}
+
+/* ───────────── Тёмная тема (по умолчанию) ───────────── */
+:root {
+  --panel-bg: rgba(20, 18, 28, 0.94);
+  --panel-border: rgba(155, 123, 184, 0.14);
+  --text-primary: #ede9f2;
+  --text-secondary: #8a8798;
+  --text-muted: #5a5766;
+  --accent-purple: #9b7bb8;
+  --accent-purple-strong: #7c5fb0;
+  --accent-lavender: #9b7bb8;
+  --accent-gold: #d4af37;
+  --accent-blue: #6cb4ee;
+  --hover-bg: rgba(155, 123, 184, 0.12);
+  --active-bg: rgba(155, 123, 184, 0.22);
+  --bubble-ai: rgba(155, 123, 184, 0.16);
+  --bubble-user: rgba(90, 92, 112, 0.32);
+
+  /* карточки окон: цвет задаётся каналами, прозрачность — настройкой «Прозрачность окна» */
+  --card-rgb: 20, 18, 28;
+  --head-rgb: 26, 24, 38;
+  --card-alpha: 0.94;
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.55);
+  --danger: #ff4444;
+}
+
+/* ───────────── Светлая тема ───────────── */
+[data-theme='light'] {
+  --panel-bg: rgba(250, 247, 255, 0.96);
+  --panel-border: rgba(124, 95, 176, 0.22);
+  --text-primary: #2a2438;
+  --text-secondary: #5f5873;
+  --text-muted: #9a94ad;
+  --accent-purple: #8a63c2;
+  --accent-purple-strong: #6f48ad;
+  --accent-lavender: #8a63c2;
+  --accent-gold: #b68a12;
+  --accent-blue: #2f86d1;
+  --hover-bg: rgba(124, 95, 176, 0.1);
+  --active-bg: rgba(124, 95, 176, 0.18);
+  --bubble-ai: rgba(138, 99, 194, 0.14);
+  --bubble-user: rgba(60, 60, 90, 0.1);
+
+  --card-rgb: 250, 247, 255;
+  --head-rgb: 240, 235, 250;
+  --input-bg: rgba(40, 30, 70, 0.05);
+  --shadow-card: 0 20px 60px rgba(60, 40, 110, 0.28);
+  --danger: #d93030;
+}
+
+/* ───────────── Персона ARIA (окна настроек и всплывающие окна в её холодных синих тонах) ───────────── */
+[data-persona='aria'] {
+  --panel-border: rgba(90, 169, 255, 0.18);
+  --text-primary: #e7edf6;
+  --text-secondary: #8f9bb0;
+  --text-muted: #5d687c;
+  --accent-purple: #5aa9ff;
+  --accent-purple-strong: #2f7de0;
+  --accent-lavender: #5aa9ff;
+  --accent-gold: #f0bd4f;
+  --accent-blue: #62e4ff;
+  --hover-bg: rgba(90, 169, 255, 0.12);
+  --active-bg: rgba(90, 169, 255, 0.2);
+  --bubble-ai: rgba(90, 169, 255, 0.14);
+  --bubble-user: rgba(120, 130, 150, 0.22);
+  --card-rgb: 10, 14, 22;
+  --head-rgb: 15, 22, 35;
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --option-bg: #0f1622;
+  --option-text: #e7edf6;
+  --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+[data-persona='aria'][data-theme='light'] {
+  --panel-border: rgba(40, 90, 160, 0.22);
+  --text-primary: #1b2535;
+  --text-secondary: #4a566b;
+  --text-muted: #8591a6;
+  --accent-purple: #2f7de0;
+  --accent-purple-strong: #1f64c0;
+  --accent-lavender: #2f7de0;
+  --accent-gold: #a87a0c;
+  --accent-blue: #1b8bb0;
+  --hover-bg: rgba(47, 125, 224, 0.1);
+  --active-bg: rgba(47, 125, 224, 0.18);
+  --bubble-ai: rgba(47, 125, 224, 0.12);
+  --bubble-user: rgba(40, 60, 100, 0.08);
+  --card-rgb: 244, 247, 252;
+  --head-rgb: 232, 239, 249;
+  --input-bg: rgba(20, 40, 80, 0.05);
+  --option-bg: #ffffff;
+  --option-text: #1b2535;
+  --shadow-card: 0 20px 60px rgba(30, 60, 110, 0.28);
+}
+
+button {
+  font-family: inherit;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+  background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+button:hover {
+  transform: translateY(-1px) scale(1.02);
+}
+
+button:active {
+  transform: translateY(0) scale(0.96);
+}
+
+/* Текст в сообщениях и полях можно выделять */
+input, textarea, .selectable, .selectable * {
+  user-select: text;
+}
+
+/* Кастомный скроллбар */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent-purple);
+  border-radius: 2px;
+  opacity: 0.4;
+}
+
+/* Общие анимации */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-mic {
+  0%   { box-shadow: 0 0 0 0 rgba(155, 123, 184, 0.55); }
+  70%  { box-shadow: 0 0 0 14px rgba(155, 123, 184, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(155, 123, 184, 0); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Уважаем системную настройку «меньше анимаций» */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

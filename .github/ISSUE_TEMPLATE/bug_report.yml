@@ -1,0 +1,60 @@
+name: Ошибка / Bug report
+description: Что-то работает не так
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Не вставляйте сюда API-ключи, содержимое папки данных приложения и личные переписки.** / Never paste API keys or your app data folder here.
+  - type: input
+    id: version
+    attributes:
+      label: Версия / Version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: ОС / OS
+      placeholder: "Windows 11"
+    validations:
+      required: true
+  - type: dropdown
+    id: persona
+    attributes:
+      label: Персона / Persona
+      options: [NEKO, ARIA]
+    validations:
+      required: true
+  - type: input
+    id: provider
+    attributes:
+      label: Провайдер нейросети и модель / LLM provider and model
+      placeholder: "Ollama, gemma4:e4b"
+  - type: checkboxes
+    id: services
+    attributes:
+      label: Что запущено / What is running
+      options:
+        - label: Ollama
+        - label: Whisper (speaches / whisper.cpp)
+        - label: Chatterbox
+        - label: Stable Diffusion (AUTOMATIC1111)
+  - type: textarea
+    id: steps
+    attributes:
+      label: Шаги / Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Что ожидалось и что произошло / Expected vs actual
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Логи консоли (Ctrl+Shift+I) / Console logs
+      render: shell

@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+# Новый пуш в ту же ветку отменяет устаревший прогон
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Для проверки типов и сборки бинарник Electron (~100 МБ) не нужен — типы приходят вместе с пакетом
+      ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # npm ci требует package-lock.json — его нужно коммитить. Без него (например, в форке) ставим обычным npm install.
+      - name: Install dependencies
+        run: if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+      - name: Typecheck (vue-tsc)
+        run: npm run typecheck
+
+      - name: Build Electron main process (tsc, без electron-builder)
+        run: npm run build:electron
+
+      - name: Build renderer (vite)
+        run: npx vite build

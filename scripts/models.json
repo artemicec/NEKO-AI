@@ -1,0 +1,15 @@
+{
+  "_comment": "Манифест для scripts/download-models.mjs. Поле verified=false значит: адрес и лицензию автор проекта ещё не проверял вживую — посмотри их сам. Свою модель можно скачать командой: npm run models:download -- --url https://... --target public/models/default.vrm",
+  "models": [
+    {
+      "id": "sample",
+      "title": "Образец VRM 1.0 (из примеров библиотеки three-vrm)",
+      "target": "public/models/default.vrm",
+      "url": "https://raw.githubusercontent.com/pixiv/three-vrm/dev/packages/three-vrm/examples/models/VRM1_Constraint_Twist_Sample.vrm",
+      "sha256": null,
+      "verified": false,
+      "license": "Условия использования смотри в репозитории pixiv/three-vrm и в метаданных самой модели. Это образец для проверки, а не «лицо» вашего проекта.",
+      "licenseUrl": "https://github.com/pixiv/three-vrm"
+    }
+  ]
+}

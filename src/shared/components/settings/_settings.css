@@ -1,0 +1,180 @@
+/* src/shared/components/settings/_settings.css
+   Общие стили страниц настроек. Подключается ОДИН раз глобально (в main.ts окна),
+   поэтому в самих .vue больше нет @import внутри scoped-стилей. */
+
+.s-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.s-section {
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--panel-border);
+  padding-bottom: 4px;
+}
+
+.s-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.s-row > span:first-child {
+  flex-shrink: 0;
+}
+
+.s-row input[type='text'],
+.s-row input[type='password'],
+.s-row input[type='number'],
+.s-row select,
+.s-textarea {
+  background: var(--input-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: var(--text-primary);
+  font-size: 12px;
+  outline: none;
+  min-width: 130px;
+  max-width: 200px;
+  font-family: inherit;
+}
+
+.s-row select option {
+  background: var(--option-bg, #1a1826);
+  color: var(--option-text, #ede9f2);
+}
+
+.s-textarea {
+  width: 100%;
+  max-width: none;
+  min-height: 56px;
+  resize: vertical;
+}
+
+.s-row input[type='text']:focus,
+.s-row input[type='password']:focus,
+.s-row input[type='number']:focus,
+.s-row select:focus,
+.s-textarea:focus {
+  border-color: var(--accent-purple);
+}
+
+.s-row input[type='range'] {
+  width: 120px;
+  accent-color: var(--accent-purple);
+}
+
+.s-row input[type='checkbox'] {
+  accent-color: var(--accent-purple);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.s-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.s-hint {
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.s-btn {
+  align-self: flex-start;
+  background: var(--active-bg);
+  border: 1px solid var(--panel-border);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.s-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.s-btn:hover {
+  border-color: var(--accent-purple);
+}
+
+.s-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.s-status {
+  font-size: 12px;
+}
+.s-status.ok { color: #5fd38d; }
+.s-status.bad { color: var(--danger); }
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: color-mix(in srgb, var(--accent-purple) 22%, transparent);
+  border-radius: 22px;
+  transition: background 0.25s;
+}
+
+.slider::before {
+  content: '';
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  top: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.25s;
+}
+
+.switch input:checked + .slider {
+  background: var(--accent-purple);
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(18px);
+}
+
+.s-hint code {
+  background: var(--input-bg);
+  padding: 0 4px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.s-row input:disabled,
+.s-row select:disabled {
+  opacity: 0.5;
+}
