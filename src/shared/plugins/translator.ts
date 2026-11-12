@@ -4,6 +4,7 @@
 
 import type { Plugin, PluginContext } from '@shared/types'
 import { fetchJson, hasCyrillic, type FetchLike } from './netUtil'
+import { byPersona, nekoSignoff } from './flavor'
 
 const LANGS: [stem: string, code: string][] = [
   ['русск', 'ru'], ['англ', 'en'], ['немец', 'de'], ['герман', 'de'], ['француз', 'fr'], ['франц', 'fr'],
@@ -90,11 +91,11 @@ export class TranslatorPlugin implements Plugin {
       const translated = await translateText(req.text, req.from, req.to, ctx?.signal, this.fetchFn)
       return (
         `🌍 **Перевод** (${LANG_NAMES[req.from] ?? req.from} → ${LANG_NAMES[req.to] ?? req.to})\n\n` +
-        `> ${req.text}\n\n**${translated}**\n\n*Мяу~ Я знаю много языков!* 🌟`
+        `> ${req.text}\n\n**${translated}**${nekoSignoff('*Мяу~ Я знаю много языков!* 🌟')}`
       )
     } catch (e) {
       if ((e as Error)?.name === 'AbortError') throw e
-      return 'Извини, не смогла перевести сейчас… Попробуй позже! 💙'
+      return byPersona('Извини, не смогла перевести сейчас… Попробуй позже! 💙', 'Не удалось перевести сейчас. Попробуй позже.')
     }
   }
 }

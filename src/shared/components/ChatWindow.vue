@@ -483,7 +483,7 @@ const openImage = (src: string, caption?: string) => {
   color: #fff;
   font-size: 18px;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(124, 95, 176, 0.4);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--accent-purple) 40%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -552,7 +552,7 @@ const openImage = (src: string, caption?: string) => {
   background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-strong));
   border: none;
   color: #fff;
-  box-shadow: 0 6px 18px rgba(124, 95, 176, 0.4);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--accent-purple) 40%, transparent);
 }
 .send-btn:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
 </style>

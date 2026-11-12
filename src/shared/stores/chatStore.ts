@@ -18,7 +18,7 @@ import { recallMemories, type RecallChip } from '@shared/services/memoryRecall'
 import { currentPersona } from '@shared/persona'
 import { judgeStreamHead } from '@shared/services/webRouter'
 import { safeInvoke, toPlain } from '@shared/services/ipcSafe'
-import { AIError, humanizeError } from '@shared/services/aiTypes'
+import { AIError, errorFixes, humanizeError } from '@shared/services/aiTypes'
 import { analyzeEmotion } from '@shared/services/emotion'
 import { SentenceSplitter } from '@shared/services/sentenceSplitter'
 import { speechOutput } from '@shared/services/speechOutput'
@@ -86,7 +86,7 @@ export const useChatStore = defineStore('chat', () => {
   const setSystemPrompt = (prompt: string) => { systemPrompt.value = prompt }
 
   /** Системный промпт; правило «проси поиск строкой [[WEB: …]]» нужно только там, где модель вправе его использовать */
-  const promptFor = (withWebRule: boolean) => buildSystemPrompt(systemPrompt.value, true, { web: withWebRule })
+  const promptFor = (withWebRule: boolean) => buildSystemPrompt(systemPrompt.value, true, { web: withWebRule, persona: currentPersona() })
 
   /* ───────────── сохранение на диск ───────────── */
 
@@ -292,17 +292,19 @@ export const useChatStore = defineStore('chat', () => {
           provider: s.provider,
           ...activeModel(s),
         }) || 'Произошла ошибка. Попробуй ещё раз.'
+      const fix = errorFixes(e, { provider: s.provider })
       console.error('AI error:', e)
       if (acc.trim()) {
         // уже что-то пришло — не теряем, просто дописываем пометку
         placeholder.content = acc.trim()
         placeholder.streaming = false
         persistMessage(placeholder)
-        push({ role: 'assistant', content: human, error: true }, false)
+        push({ role: 'assistant', content: human, error: true, ...(fix.length ? { fix } : {}) }, false)
       } else {
         placeholder.content = human
         placeholder.streaming = false
         placeholder.error = true
+        if (fix.length) placeholder.fix = fix
       }
     } finally {
       ctrl.signal.removeEventListener('abort', relayAbort)

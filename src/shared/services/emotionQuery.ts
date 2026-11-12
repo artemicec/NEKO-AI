@@ -36,6 +36,33 @@ const FILLER = new Set(
     .filter(Boolean)
 )
 
+/**
+ * Слова-усилители: «очень грустно», «сильно расстроилась». Сами по себе темой не являются — раньше «очень» принималось за тему,
+ * и запись про грусть «не находилась», потому что слова «очень» в ней нет. Сильные ещё и просят выбирать самые яркие записи.
+ */
+const STRONG_STEMS = /^(очен|сильн|слишком|чересчур|крайн|жутк|ужасн|безумн|дико$|невероятн|настольк|особенн|максимальн|невыносим|нестерпим|безмерн|чертовск)/
+const SOFT_STEMS = /^(немнож|немног|чуть|слегка|капельк|чуточк)/
+
+export type Intensity = 'strong' | 'soft'
+export function intensityOfWord(word: string): Intensity | null {
+  const w = norm(word)
+  if (STRONG_STEMS.test(w)) return 'strong'
+  if (SOFT_STEMS.test(w)) return 'soft'
+  return null
+}
+
+/** С какого балла (см. emotionScore) запись считается «яркой»: настроение дня = 3, мысль = 1 */
+export const STRONG_SCORE = 3
+
+/**
+ * «Очень грустно» → оставить самые яркие записи. Если ярких нет — не оставлять человека ни с чем: возвращается всё как было.
+ */
+export function preferStrong<T>(items: readonly T[], score: (x: T) => number, intense: boolean): T[] {
+  if (!intense) return [...items]
+  const strong = items.filter((x) => score(x) >= STRONG_SCORE)
+  return strong.length ? strong : [...items]
+}
+
 const tokens = (s: string): string[] => norm(s).split(/[^\p{L}\p{N}-]+/u).filter(Boolean)
 
 export function emotionOfWord(word: string): EmotionLabel | null {
@@ -51,19 +78,25 @@ export interface EmotionQuery {
   rest: string
   /** То, что осталось после удаления и слов-эмоций, и служебных слов: настоящая «тема» (может быть пустой) */
   topic: string
+  /** Есть сильный усилитель («очень», «сильно») — нужны самые яркие записи */
+  intense: boolean
 }
 
 export function parseEmotionQuery(text: string): EmotionQuery {
   const emotions: EmotionLabel[] = []
   const restWords: string[] = []
+  let intense = false
   for (const w of tokens(text)) {
     const e = emotionOfWord(w)
     if (e) { if (!emotions.includes(e)) emotions.push(e) } else restWords.push(w)
   }
+  // усилитель считается только рядом с эмоцией: «очень вкусный борщ» — не про эмоции вовсе
+  if (emotions.length) intense = restWords.some((w) => intensityOfWord(w) === 'strong')
   return {
     emotions,
     rest: restWords.join(' '),
-    topic: restWords.filter((w) => !FILLER.has(w)).join(' '),
+    topic: restWords.filter((w) => !FILLER.has(w) && !intensityOfWord(w)).join(' '),
+    intense,
   }
 }
 

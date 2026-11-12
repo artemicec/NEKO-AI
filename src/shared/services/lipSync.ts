@@ -389,6 +389,13 @@ export class MouthFilter {
   }
 
   get isClosed() { return this.cur.every((v) => v === 0) }
+
+  /** Полный сброс: рот закрыт, последний кадр забыт. Нужен при смене VRM-модели — иначе у новой модели рот «подхватит» чужое положение */
+  reset() {
+    this.cur = closed()
+    this.target = closed()
+    this.lastFrameAt = -Infinity
+  }
 }
 
 /**

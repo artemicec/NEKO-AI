@@ -174,7 +174,7 @@ h2 { font-size: 16pt; margin: 0 0 4pt; }
 h3 { font-size: 12.5pt; margin: 14pt 0 4pt; color: #555; }
 h4 { font-size: 11.5pt; margin: 10pt 0 2pt; }
 .sub { color: #777; font-size: 9.5pt; }
-.mood { margin: 2pt 0 10pt; padding: 6pt 10pt; border-left: 3pt solid #9b7bb8; background: #f5f1fa; font-style: italic; }
+.mood { margin: 2pt 0 10pt; padding: 6pt 10pt; border-left: 3pt solid #6471f0; background: #f1f2fd; font-style: italic; }
 p { margin: 0 0 7pt; } ul, ol { margin: 0 0 7pt; padding-left: 18pt; }
 code { font-family: Consolas, monospace; background: #eee; padding: 0 2pt; }
 .entry + .entry { break-before: page; }

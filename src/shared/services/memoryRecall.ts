@@ -15,7 +15,7 @@
 // Ограничение: поиск по словам, а не по смыслу («кошка» не найдёт «котёнка»); даты — с точностью до дня.
 
 import type { DiaryEntry, EmotionLabel, Message } from '@shared/types'
-import { asksAboutPastFeeling, emotionScore, parseEmotionQuery } from './emotionQuery'
+import { asksAboutPastFeeling, emotionScore, parseEmotionQuery, preferStrong } from './emotionQuery'
 import { safeInvoke } from './ipcSafe'
 import { memoryAPI } from './memoryClient'
 
@@ -317,6 +317,8 @@ export interface RecallQuery {
   words: string[]
   /** «Когда мне было грустно?» — какие эмоции названы; записи ищутся по настроению дня, а не по слову «грустно» */
   emotions: EmotionLabel[]
+  /** «Когда мне было ОЧЕНЬ грустно?» — искать самые яркие записи (если их нет — любые про эту эмоцию) */
+  intense?: boolean
 }
 
 export function detectRecall(text: string, now: Date = new Date()): RecallQuery | null {
@@ -335,7 +337,7 @@ export function detectRecall(text: string, now: Date = new Date()): RecallQuery 
   let rest = found ? n.replace(found.matched, ' ') : n
   if (feeling) rest = parseEmotionQuery(rest).topic
   const { words, stems } = topicWords(rest)
-  return { strong, date: found?.ref ?? null, tokens: stems, words, emotions: feeling ? emo.emotions : [] }
+  return { strong, date: found?.ref ?? null, tokens: stems, words, emotions: feeling ? emo.emotions : [], intense: feeling && emo.intense }
 }
 
 /* ═════════════ чтение памяти ═════════════ */
@@ -561,7 +563,10 @@ export async function recallMemories(text: string, opts: RecallOptions = {}): Pr
     const fromMs = dayMs(query.date.from, false)
     const toMs = dayMs(query.date.to, true)
     let inRange = entries.filter((e) => (e.date >= query.date!.from && e.date <= query.date!.to) || (e.range && e.range.to >= fromMs && e.range.from <= toMs))
-    if (query.emotions.length) inRange = inRange.filter((e) => emotionScore(e, query.emotions) > 0)
+    if (query.emotions.length) {
+      inRange = inRange.filter((e) => emotionScore(e, query.emotions) > 0)
+      inRange = preferStrong(inRange, (e) => emotionScore(e, query.emotions), !!query.intense)
+    }
     if (query.tokens.length && inRange.length > 1) {
       const rank = new Map(bm25Rank(inRange.map((e) => ({ id: e.id, tokens: tokenizeAll(diaryDoc(e)) })), query.tokens).map((r) => [r.id, r.score]))
       picked = [...inRange].sort((a, b) => (rank.get(b.id) ?? 0) - (rank.get(a.id) ?? 0) || a.date.localeCompare(b.date))
@@ -571,9 +576,11 @@ export async function recallMemories(text: string, opts: RecallOptions = {}): Pr
     picked = picked.slice(0, maxEntries)
   } else if (query.emotions.length) {
     // по настроению: сначала записи, которые больше всего «про это», при равенстве — свежие; читаем потом по порядку дат
-    picked = entries
-      .map((e) => ({ e, score: emotionScore(e, query.emotions) }))
-      .filter((x) => x.score > 0)
+    picked = preferStrong(
+      entries.map((e) => ({ e, score: emotionScore(e, query.emotions) })).filter((x) => x.score > 0),
+      (x) => x.score,
+      !!query.intense,
+    )
       .sort((a, b) => b.score - a.score || b.e.date.localeCompare(a.e.date))
       .slice(0, maxEntries)
       .map((x) => x.e)

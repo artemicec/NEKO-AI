@@ -5,6 +5,7 @@
 // никакого исполнения кода, лимиты на длину и глубину.
 
 import type { Plugin } from '@shared/types'
+import { nekoSignoff } from './flavor'
 
 /* ─────────────────────────── Токенайзер ─────────────────────────── */
 
@@ -280,7 +281,7 @@ export class CalculatorPlugin implements Plugin {
     if (!found) return ''
     try {
       const value = evaluate(expandPercentOf(found.expr))
-      return `🔢 ${found.expr} = **${formatNumber(value)}**\n\n*Ня~ Математика — это просто!* ✨`
+      return `🔢 ${found.expr} = **${formatNumber(value)}**${nekoSignoff('*Ня~ Математика — это просто!* ✨')}`
     } catch {
       return found.explicit ? '🔢 Не смогла разобрать выражение. Проверь скобки и знаки — например: «посчитай (12+8)*3».' : ''
     }

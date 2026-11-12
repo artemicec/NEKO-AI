@@ -1,6 +1,6 @@
 {
   "name": "neko-aria-suite",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "NEKO — desktop AI VTuber companion and ARIA — Jarvis-style assistant (Electron + Vue + VRM)",
   "license": "MIT",
   "private": true,
@@ -30,10 +30,15 @@
     "files": [
       "dist/**/*",
       "dist-electron/**/*",
+      "scripts/models.json",
       "package.json"
     ],
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "artifactName": "${productName}-Setup-${version}.${ext}"
     },
     "directories": {
       "output": "release"

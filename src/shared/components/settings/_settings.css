@@ -16,7 +16,7 @@
   font-weight: 600;
   letter-spacing: 0.8px;
   text-transform: uppercase;
-  color: var(--text-secondary);
+  color: var(--accent-blue);
   border-bottom: 1px solid var(--panel-border);
   padding-bottom: 4px;
 }
@@ -67,6 +67,7 @@
 .s-row select:focus,
 .s-textarea:focus {
   border-color: var(--accent-purple);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-purple) 22%, transparent);
 }
 
 .s-row input[type='range'] {
@@ -95,7 +96,7 @@
 
 .s-btn {
   align-self: flex-start;
-  background: var(--active-bg);
+  background: linear-gradient(135deg, var(--active-bg), var(--hover-bg));
   border: 1px solid var(--panel-border);
   color: var(--text-primary);
   border-radius: 8px;
@@ -112,6 +113,7 @@
 
 .s-btn:hover {
   border-color: var(--accent-purple);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent-purple) 30%, transparent);
 }
 
 .s-btn:disabled {

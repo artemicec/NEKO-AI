@@ -18,7 +18,7 @@ const H = 900
 
 function hexToRgb(hex: string): [number, number, number] {
   const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim())
-  const n = parseInt(m ? m[1] : '9b7bb8', 16)
+  const n = parseInt(m ? m[1] : '8b95ff', 16)
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
 }
 

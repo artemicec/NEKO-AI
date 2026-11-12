@@ -4,6 +4,7 @@
 
 import type { Plugin, PluginContext } from '@shared/types'
 import { fetchJson, type FetchLike } from './netUtil'
+import { byPersona, nekoSignoff } from './flavor'
 
 const WMO: Record<number, string> = {
   0: 'ясно ☀️', 1: 'в основном ясно 🌤️', 2: 'переменная облачность ⛅', 3: 'пасмурно ☁️',
@@ -94,12 +95,12 @@ export class WeatherPlugin implements Plugin {
         `🌤️ **${place}** — сейчас\n\n` +
         `🌡️ **${round(c.temperature_2m)}°C** (ощущается как ${round(c.apparent_temperature)}°C), ${describeWeatherCode(c.weather_code)}\n\n` +
         `💨 ветер ${Math.round(c.wind_speed_10m * 10) / 10} м/с · 💧 влажность ${c.relative_humidity_2m}%\n\n` +
-        `📅 ${day(0, 'Сегодня')}\n\n📅 ${day(1, 'Завтра')}\n\n` +
-        `*Мяу~ Не забудь одеться по погоде!* 💙`
+        `📅 ${day(0, 'Сегодня')}\n\n📅 ${day(1, 'Завтра')}` +
+        nekoSignoff('*Мяу~ Не забудь одеться по погоде!* 💙')
       )
     } catch (e) {
       if ((e as Error)?.name === 'AbortError') throw e
-      return `🌤️ Не получилось узнать погоду для «${city}» — похоже, нет связи с сервисом. Попробуй позже! ✨`
+      return `🌤️ Не получилось узнать погоду для «${city}» — похоже, нет связи с сервисом. ${byPersona('Попробуй позже! ✨', 'Попробуй позже.')}`
     }
   }
 }

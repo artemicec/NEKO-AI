@@ -3,7 +3,7 @@
    Цвета берутся из переменных темы (base.css), поэтому светлая тема и «Прозрачность окон» работают везде. */
 
 :root {
-  --neko-accent: #9b7bb8;
+  --neko-accent: #8b95ff;
   --neko-warm: #d4af37;
   --neko-pink: #e8a4c8;
 }
@@ -120,6 +120,7 @@
   transform: translateY(-2px) scale(1.06);
   background: var(--active-bg);
   border-color: var(--accent-purple);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3), 0 0 14px color-mix(in srgb, var(--accent-purple) 45%, transparent);
 }
 .neko-btn:active { transform: scale(0.94); }
 .neko-btn.close:hover {
@@ -163,7 +164,7 @@
   border: 1px solid var(--panel-border);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   -webkit-app-region: no-drag;
@@ -173,7 +174,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  background: rgba(var(--head-rgb), 0.9);
+  background: linear-gradient(180deg, rgba(var(--head-rgb), 0.96), rgba(var(--head-rgb), 0.82));
   border-bottom: 1px solid var(--panel-border);
   flex-shrink: 0;
 }
@@ -183,6 +184,7 @@
   font-weight: 600;
   letter-spacing: 0.5px;
   color: var(--text-primary);
+  text-shadow: 0 0 14px color-mix(in srgb, var(--accent-purple) 40%, transparent);
 }
 .window-head .title.center { text-align: center; }
 .window-head .close-btn,

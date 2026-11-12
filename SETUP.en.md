@@ -4,7 +4,7 @@
 
 Tested on **Windows 10/11**. Running from source on macOS/Linux should probably work but has not been tested.
 
-You only need two things: **Node.js** and **some LLM** (local Ollama or a cloud provider key). Voice, images and the avatar are optional and can be added in any order.
+To get going you only need two things: **Node.js** and **some language model** (local Ollama or a cloud provider key). Voice, images and the avatar can wait — add them later, in any order, whenever you feel like it.
 
 ## 1. Running the app
 
@@ -29,7 +29,9 @@ Desktop shortcuts: `npm run shortcuts`.
 > **About settings.** The built version (`NEKO.bat`, installer) and dev mode (`npm run dev:*`) keep window settings separately (different page origin). If you used `dev:*` before,
 > re-enter settings and keys after switching. Chat history and the diary live in the app data folder and are **kept**.
 
-> **About the installer.** `.vrm` files are not part of the repository (model licenses), so an installer built by `build:*` contains no avatar. For now running from source is the simplest path: put your model into `public/models/` (step 3).
+> **Ready-made installers.** If the repository on GitHub has a **Releases** section, you'll find `NEKO-Setup-….exe` and `ARIA-Setup-….exe` there. No Node.js needed — just run the file.
+> They aren't code-signed, so Windows SmartScreen may complain. Click "More info", then "Run anyway". If you want to be sure the file wasn't tampered with, compare it with `SHA256SUMS.txt` next to it.
+> `.vrm` files aren't included (model licenses), but adding an avatar takes a couple of clicks — see step 3.
 
 ## 2. LLM (required)
 
@@ -45,13 +47,17 @@ Paste the key (the "where to get a key" link is under the field), press "Model l
 
 ## 3. Avatar (VRM model)
 
-| For | Put it at |
+**Easiest, for every kind of install:** *Settings → Check and install* → **"Download sample VRM"** fetches a test model, **"Models folder"** opens the folder for your own `.vrm`. The avatar appears at once, no restart.
+
+| For | File name |
 | --- | --- |
-| NEKO | `public/models/default.vrm` |
-| ARIA (optional; without it a "lens" is shown) | `public/models/aria.vrm` |
+| NEKO | `default.vrm` |
+| ARIA (optional; without it a "lens" is shown) | `aria.vrm` |
+
+Models folder: `%APPDATA%\neko-aria-suite\models\` (launcher; or `public/models/` in the project), `%APPDATA%\NEKO\models\` / `%APPDATA%\ARIA\models\` (installers), `public/models/` (`npm run dev:*`). Animations `.vrma` go to a sibling `animations` folder.
 
 Get models from [VRoid Hub](https://hub.vroid.com), [Booth](https://booth.pm) or make your own in VRoid Studio. **Check the model's license** — that's why `.vrm` files are git-ignored.
-A sample for testing: `npm run models:download` (the URL in `scripts/models.json` is marked `"verified": false`: the author has not verified it live; the script checks that the download really is a VRM).
+The same from a terminal (writes to the project's `public/models/`): `npm run models:download` (the URL in `scripts/models.json` is marked `"verified": false`: the author has not verified it live; the script checks that the download really is a VRM).
 Animations (optional): `public/animations/VRMA_01.vrma … VRMA_07.vrma`, see [public/animations/README.md](public/animations/README.md).
 
 ## 4. Voice input: Whisper (optional)
@@ -91,7 +97,7 @@ On the very first launch a settings window opens on **"Check and install"**: it 
 | --- | --- |
 | `Missing script: "…"` | outdated `package.json`; update the project |
 | `Electron failed to install correctly` | delete `node_modules`, run `npm install` again |
-| No avatar | model file missing — the wizard shows which one |
+| No avatar | model file missing — the wizard shows which one and has a "Download sample VRM" button |
 | "Ollama is not responding" | is Ollama running (tray icon)? `ollama list` should answer |
 | Cloud 400/404 | wrong model name — press "Model list"; check the key |
 | Voice silent | "Test voice" in *Voice and sound* shows the reason |

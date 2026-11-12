@@ -6,6 +6,7 @@
 import type { Plugin, PluginContext, NewsItem } from '@shared/types'
 
 import { defaultTextFetcher, type TextFetcher } from './netUtil'
+import { byPersona, nekoSignoff } from './flavor'
 
 export type { TextFetcher }
 
@@ -81,10 +82,10 @@ export class NewsPlugin implements Plugin {
       const list = items
         .map((n, i) => `${i + 1}. ${n.url ? `[${stripMd(n.title)}](${n.url})` : stripMd(n.title)}${n.source ? ` — *${stripMd(n.source)}*` : ''}`)
         .join('\n')
-      return `📰 ${query ? `Новости про «${query}»` : 'Главные новости'}:\n\n${list}\n\n*Ня~ Будь в курсе событий!* ✨`
+      return `📰 ${query ? `Новости про «${query}»` : 'Главные новости'}:\n\n${list}${nekoSignoff('*Ня~ Будь в курсе событий!* ✨')}`
     } catch (e) {
       if ((e as Error)?.name === 'AbortError') throw e
-      return '📰 Не удалось загрузить новости. Проверь подключение к интернету! 💙'
+      return `📰 Не удалось загрузить новости. ${byPersona('Проверь подключение к интернету! 💙', 'Проверь подключение к интернету.')}`
     }
   }
 }

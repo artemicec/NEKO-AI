@@ -23,7 +23,12 @@ export interface SetupItem {
   help?: { label: string; url: string }
   /** Команда, которую можно скопировать */
   command?: string
+  /** Действие кнопкой в окне (работает только внутри приложения): скачать образец VRM в папку моделей */
+  action?: { kind: 'download-vrm'; path: string }
 }
+
+/** Путь модели, который приложение умеет заполнять само (совпадает с проверкой в electron/modelFiles.ts) */
+const DOWNLOADABLE_VRM = /^\/models\/[A-Za-z0-9][A-Za-z0-9._-]{0,80}\.vrm$/i
 
 export type SetupSettings = Pick<
   AppSettings,
@@ -205,8 +210,9 @@ export async function checkVrm(s: SetupSettings, persona: 'neko' | 'aria', f: Fe
     level: persona === 'aria' ? 'off' : 'fail',
     detail: kind === 'notglb'
       ? `Файл ${path} найден, но это не VRM-модель. ${lack}`
-      : `Файла нет: ${path}. Положи свою .vrm в public/models/ (в SETUP.md — как) или скачай рекомендованную. ${lack}`,
+      : `Файла нет: ${path}. Нажми «Скачать образец» (он нужен для проверки; лицензию модели смотри у автора) или положи свою .vrm в папку моделей (кнопка ниже; в SETUP.md — подробности). ${lack}`,
     command: 'npm run models:download',
+    ...(DOWNLOADABLE_VRM.test(path) ? { action: { kind: 'download-vrm' as const, path } } : {}),
   }
 }
 

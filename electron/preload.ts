@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
 // События, на которые окна могут подписываться (всё остальное — только invoke)
-const EVENTS = new Set(['diary:changed', 'diary:write-request', 'diary:status', 'emotion:changed', 'lipsync:frame', 'settings:goto', 'reminders:changed'])
+const EVENTS = new Set(['diary:changed', 'diary:write-request', 'diary:status', 'emotion:changed', 'lipsync:frame', 'settings:goto', 'reminders:changed', 'models:progress', 'models:changed'])
 
 contextBridge.exposeInMainWorld('electronAPI', {
   invoke: (channel: string, ...args: any[]) => ipcRenderer.invoke(channel, ...args),

@@ -12,51 +12,52 @@ html, body, #app {
 
 /* ───────────── Тёмная тема (по умолчанию) ───────────── */
 :root {
-  --panel-bg: rgba(20, 18, 28, 0.94);
-  --panel-border: rgba(155, 123, 184, 0.14);
-  --text-primary: #ede9f2;
-  --text-secondary: #8a8798;
-  --text-muted: #5a5766;
-  --accent-purple: #9b7bb8;
-  --accent-purple-strong: #7c5fb0;
-  --accent-lavender: #9b7bb8;
-  --accent-gold: #d4af37;
-  --accent-blue: #6cb4ee;
-  --hover-bg: rgba(155, 123, 184, 0.12);
-  --active-bg: rgba(155, 123, 184, 0.22);
-  --bubble-ai: rgba(155, 123, 184, 0.16);
-  --bubble-user: rgba(90, 92, 112, 0.32);
+  /* Палитра взята с иконки приложения: глубокий индиго, сиреневато-синий акцент и холодный голубой «неон» */
+  --panel-bg: rgba(14, 16, 38, 0.94);
+  --panel-border: rgba(132, 146, 255, 0.17);
+  --text-primary: #eceffd;
+  --text-secondary: #9ca4c6;
+  --text-muted: #6d7499;
+  --accent-purple: #8b95ff;
+  --accent-purple-strong: #6471f0;
+  --accent-lavender: #8b95ff;
+  --accent-gold: #e0b94a;
+  --accent-blue: #7fd6ff;
+  --hover-bg: rgba(132, 146, 255, 0.12);
+  --active-bg: rgba(132, 146, 255, 0.22);
+  --bubble-ai: rgba(132, 146, 255, 0.15);
+  --bubble-user: rgba(86, 96, 140, 0.32);
 
   /* карточки окон: цвет задаётся каналами, прозрачность — настройкой «Прозрачность окна» */
-  --card-rgb: 20, 18, 28;
-  --head-rgb: 26, 24, 38;
+  --card-rgb: 14, 16, 38;
+  --head-rgb: 22, 25, 56;
   --card-alpha: 0.94;
-  --input-bg: rgba(255, 255, 255, 0.05);
-  --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.55);
+  --input-bg: rgba(255, 255, 255, 0.055);
+  --shadow-card: 0 20px 60px rgba(3, 4, 18, 0.6), 0 0 0 1px rgba(132, 146, 255, 0.06);
   --danger: #ff4444;
 }
 
 /* ───────────── Светлая тема ───────────── */
 [data-theme='light'] {
-  --panel-bg: rgba(250, 247, 255, 0.96);
-  --panel-border: rgba(124, 95, 176, 0.22);
-  --text-primary: #2a2438;
-  --text-secondary: #5f5873;
-  --text-muted: #9a94ad;
-  --accent-purple: #8a63c2;
-  --accent-purple-strong: #6f48ad;
-  --accent-lavender: #8a63c2;
+  --panel-bg: rgba(247, 248, 255, 0.96);
+  --panel-border: rgba(84, 98, 214, 0.22);
+  --text-primary: #1f2340;
+  --text-secondary: #525980;
+  --text-muted: #868cad;
+  --accent-purple: #5b67e0;
+  --accent-purple-strong: #4552c8;
+  --accent-lavender: #5b67e0;
   --accent-gold: #b68a12;
-  --accent-blue: #2f86d1;
-  --hover-bg: rgba(124, 95, 176, 0.1);
-  --active-bg: rgba(124, 95, 176, 0.18);
-  --bubble-ai: rgba(138, 99, 194, 0.14);
-  --bubble-user: rgba(60, 60, 90, 0.1);
+  --accent-blue: #1a7fc4;
+  --hover-bg: rgba(91, 103, 224, 0.1);
+  --active-bg: rgba(91, 103, 224, 0.18);
+  --bubble-ai: rgba(91, 103, 224, 0.12);
+  --bubble-user: rgba(50, 56, 100, 0.09);
 
-  --card-rgb: 250, 247, 255;
-  --head-rgb: 240, 235, 250;
-  --input-bg: rgba(40, 30, 70, 0.05);
-  --shadow-card: 0 20px 60px rgba(60, 40, 110, 0.28);
+  --card-rgb: 247, 248, 255;
+  --head-rgb: 235, 238, 252;
+  --input-bg: rgba(30, 36, 90, 0.05);
+  --shadow-card: 0 20px 60px rgba(50, 60, 140, 0.28);
   --danger: #d93030;
 }
 
@@ -132,15 +133,30 @@ input, textarea, .selectable, .selectable * {
 
 /* Кастомный скроллбар */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--accent-purple);
-  border-radius: 2px;
-  opacity: 0.4;
+  background: color-mix(in srgb, var(--accent-purple) 45%, transparent);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--accent-purple) 75%, transparent);
+}
+
+/* Выделение текста и фокус с клавиатуры (у полей ввода своя подсветка в рамке) */
+::selection {
+  background: color-mix(in srgb, var(--accent-purple) 38%, transparent);
+}
+:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent-blue) 80%, transparent);
+  outline-offset: 2px;
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: none;
 }
 
 /* Общие анимации */
@@ -150,9 +166,9 @@ input, textarea, .selectable, .selectable * {
 }
 
 @keyframes pulse-mic {
-  0%   { box-shadow: 0 0 0 0 rgba(155, 123, 184, 0.55); }
-  70%  { box-shadow: 0 0 0 14px rgba(155, 123, 184, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(155, 123, 184, 0); }
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-purple) 55%, transparent); }
+  70%  { box-shadow: 0 0 0 14px color-mix(in srgb, var(--accent-purple) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-purple) 0%, transparent); }
 }
 
 @keyframes slide-up {

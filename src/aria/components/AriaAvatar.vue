@@ -23,6 +23,7 @@ const service = new VRMService()
 let disposed = false
 let loadId = 0
 let offMouth: (() => void) | null = null
+let offModels: (() => void) | null = null
 
 // ARIA — ассистент, а не питомец: ей подходят только спокойные idle-анимации (без «сесть» и «лечь»)
 const ANIMATIONS = [
@@ -69,6 +70,8 @@ onMounted(async () => {
   service.setPaused(true) // пока модели нет — не рисуем пустую сцену
   // Липсинк: чат и аватар ARIA в одном окне — форма рта приходит напрямую из озвучки, IPC не нужен
   offMouth = speechOutput.onMouth((m) => service.setMouth(m))
+  // модель появилась (скачали образец или положили файл): перечитать без перезапуска
+  offModels = window.electronAPI?.on('models:changed', () => { void load() }) ?? null
   await load()
 })
 
@@ -88,6 +91,7 @@ watch(() => settingsStore.settings.ariaVrmModelPath, () => { void load() })
 onBeforeUnmount(() => {
   disposed = true
   offMouth?.()
+  offModels?.()
   service.dispose()
 })
 </script>

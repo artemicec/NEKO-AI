@@ -16,6 +16,7 @@ const vrmService = new VRMService()
 let disposed = false
 let offEmotion: (() => void) | null = null
 let offMouth: (() => void) | null = null
+let offModels: (() => void) | null = null
 
 const animationFiles: { name: string; url: string }[] = [
   { name: 'idle1', url: '/animations/VRMA_01.vrma' },
@@ -56,6 +57,9 @@ onMounted(async () => {
     vrmService.setMouth(Array.isArray(frame) ? frame : null)
   }) ?? null
 
+  // модель появилась (скачали образец или положили файл): перечитать без перезапуска
+  offModels = window.electronAPI?.on('models:changed', () => { void loadAvatar() }) ?? null
+
   await loadAvatar()
 })
 
@@ -67,6 +71,7 @@ onUnmounted(() => {
   disposed = true
   offEmotion?.()
   offMouth?.()
+  offModels?.()
   vrmService.dispose()
 })
 

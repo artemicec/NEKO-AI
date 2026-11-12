@@ -21,6 +21,7 @@ import { exportDiary } from './diaryExportRun'
 import { ReminderService } from './reminders'
 import { loadPrefs, sanitizePrefs, savePrefs, shouldHideOnClose, type AppPrefs } from './appPrefs'
 import { TrayController } from './tray'
+import { downloadModelFile, looksLikeGlb, modelFileName, modelsDir, parseManifest, userAssetPath } from './modelFiles'
 
 // Кого запускаем: --persona=aria, переменная NEKO_PERSONA или имя exe (собранный `npm run build:aria` даёт ARIA.exe)
 const persona: 'neko' | 'aria' =
@@ -150,6 +151,8 @@ let isQuitting = false
 let trayHintShown = false
 const prefsPath = () => path.join(app.getPath('userData'), 'app-prefs.json')
 const ICON_DIRS = () => [path.join(__dirname, '../public/icons'), path.join(__dirname, '../dist/icons')]
+/** Значок окон: public/icons/<persona>.png (при запуске из исходников) или dist/icons (в установленном приложении). Нет файла — значок по умолчанию */
+const windowIcon = (): string | undefined => ICON_DIRS().map((d) => path.join(d, `${persona}.png`)).find((f) => fs.existsSync(f))
 const hidesToTray = () => shouldHideOnClose(prefs, !!tray?.alive, isQuitting)
 
 function createWindow(
@@ -167,6 +170,7 @@ function createWindow(
     hasShadow: false,
     backgroundColor: '#00000000',
     show: false,
+    icon: windowIcon(), // значок в панели задач: без него при запуске через NEKO.bat там был бы значок Electron
     ...opts,
     ...(remember ? restoreBounds(name, defaults) : {}),
     webPreferences,
@@ -192,7 +196,6 @@ function createMainWindow() {
       resizable: true,
       maximizable: isAria,
       alwaysOnTop: !isAria,
-      icon: path.join(__dirname, `../public/icons/${persona}.png`),
     },
     pageURL(persona)
   )
@@ -328,6 +331,48 @@ function broadcast(channel: string, payload?: unknown) {
   }
 }
 
+/* ───────────────────────── Модели аватара ───────────────────────── */
+
+let modelDownloading = false
+
+/** Образец VRM из scripts/models.json → в папку моделей. Ответ — всегда обычный объект (ошибки не бросаем: окно покажет текст) */
+async function downloadSampleModel(sender: IpcMainInvokeEvent['sender'], urlPath: unknown) {
+  const name = modelFileName(urlPath)
+  if (!name) return { ok: false, error: 'Путь модели в настройках нестандартный — положи файл вручную (см. SETUP.md).' }
+  if (modelDownloading) return { ok: false, error: 'Скачивание уже идёт.' }
+  let model
+  try {
+    model = parseManifest(JSON.parse(fs.readFileSync(path.join(app.getAppPath(), 'scripts', 'models.json'), 'utf8')))[0]
+  } catch { /* нет манифеста — ниже понятная ошибка */ }
+  if (!model) return { ok: false, error: 'Не найден список моделей (scripts/models.json). Положи .vrm вручную.' }
+
+  const dir = modelsDir(isDev, app.getAppPath(), app.getPath('userData'))
+  const dest = path.join(dir, name)
+  const info = { license: model.license, licenseUrl: model.licenseUrl, verified: model.verified, dir }
+  if (fs.existsSync(dest) && looksLikeGlb(dest)) return { ok: false, error: `Модель уже есть: ${dest}`, ...info }
+
+  modelDownloading = true
+  let lastSent = 0
+  try {
+    const r = await downloadModelFile(model.url, dest, {
+      fetchFn: (u, init) => net.fetch(u, init) as never,
+      expectSha256: model.sha256,
+      onProgress: (received, total) => {
+        const now = Date.now()
+        if (now - lastSent < 250 || sender.isDestroyed()) return
+        lastSent = now
+        sender.send('models:progress', { received, total })
+      },
+    })
+    broadcast('models:changed') // окна с аватаром перечитают модель сами
+    return { ok: true, bytes: r.bytes, path: dest, ...info }
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : String(e), ...info }
+  } finally {
+    modelDownloading = false
+  }
+}
+
 /* ───────────────────────── Сеть ───────────────────────── */
 
 /** CORS-заплатка для локальных сервисов и известных облачных API (список хостов — в ./cors) */
@@ -387,10 +432,12 @@ app.whenReady().then(() => {
     onChange: () => broadcast('reminders:changed'),
   })
 
-  // app://bundle/<путь> → dist/<путь>
+  // app://bundle/<путь> → dist/<путь>; модели и анимации пользователя (userData/models, userData/animations) — раньше встроенных
   protocol.handle('app', (request) => {
     const root = path.join(__dirname, '../dist')
     const rel = decodeURIComponent(new URL(request.url).pathname).replace(/^\/+/, '') || 'index.html'
+    const own = userAssetPath(app.getPath('userData'), rel)
+    if (own && fs.existsSync(own)) return net.fetch(pathToFileURL(own).toString())
     const file = path.normalize(path.join(root, rel))
     if (file !== root && !file.startsWith(root + path.sep)) return new Response('Forbidden', { status: 403 })
     return net.fetch(pathToFileURL(file).toString())
@@ -477,6 +524,14 @@ function registerIpc() {
   })
   // экспорт в Markdown/PDF: диалог «Сохранить как» открывается над окном дневника
   handle('diary:export', (e, req) => exportDiary(diary, req, BrowserWindow.fromWebContents(e.sender)))
+  // модели аватара: скачать образец VRM / открыть папку, куда можно положить свою
+  handle('models:download', (e, urlPath: unknown) => downloadSampleModel(e.sender, urlPath))
+  handle('models:open-folder', async () => {
+    const dir = modelsDir(isDev, app.getAppPath(), app.getPath('userData'))
+    fs.mkdirSync(dir, { recursive: true })
+    const err = await shell.openPath(dir)
+    return { ok: !err, dir, error: err || undefined }
+  })
   handle('diary:addImage', (_e, dataUrl: string) => diary.addImage(String(dataUrl)))
   handle('diary:removeImage', (_e, file: string) => diary.removeImage(String(file)))
   // окно дневника просит «Написать запись сейчас»; писать умеет только главное окно (у него есть аватар для селфи)

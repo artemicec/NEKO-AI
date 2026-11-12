@@ -26,7 +26,7 @@ export const EMOTIONS: Record<EmotionLabel, EmotionMeta> = {
   curious:     { emoji: '🤔', ru: 'любопытство',   color: '#74c7b8', vrm: { surprised: 0.35 } },
   sleepy:      { emoji: '😴', ru: 'сонливость',    color: '#8d86b8', vrm: { relaxed: 0.5, blink: 0.55 } },
   excited:     { emoji: '🤩', ru: 'восторг',       color: '#ff9f5a', vrm: { happy: 1, surprised: 0.25 } },
-  neutral:     { emoji: '🙂', ru: 'спокойствие',   color: '#9b7bb8', vrm: {} },
+  neutral:     { emoji: '🙂', ru: 'спокойствие',   color: '#8b95ff', vrm: {} },
 }
 
 export const EMOTION_LABELS = Object.keys(EMOTIONS) as EmotionLabel[]

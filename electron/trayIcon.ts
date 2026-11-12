@@ -62,8 +62,8 @@ export function fallbackIconPng(color: [number, number, number], size = 32): Buf
   ])
 }
 
-/** Цвета ассистентов: NEKO — фиолетовый, ARIA — голубой */
+/** Цвета ассистентов: NEKO — сиренево-синий (как на иконке), ARIA — голубой */
 export const PERSONA_COLOR: Record<'neko' | 'aria', [number, number, number]> = {
-  neko: [155, 123, 184],
+  neko: [139, 149, 255],
   aria: [64, 180, 230],
 }

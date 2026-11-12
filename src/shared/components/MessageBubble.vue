@@ -35,6 +35,13 @@
         >{{ src.label }}</a>
       </div>
 
+      <!-- Исправление одной кнопкой: облако недоступно → локальная Ollama -->
+      <div v-if="message.error && fixes.length" class="fixes">
+        <button v-if="fixes.includes('use-ollama')" class="fix-btn" :disabled="switched" @click="useOllama">
+          {{ switched ? '✓ Теперь отвечает Ollama — повтори вопрос' : '🏠 Переключиться на локальную Ollama' }}
+        </button>
+      </div>
+
       <div class="bubble-meta">
         <span v-if="variant === 'console'" class="who">{{ who }}</span>
         <span v-if="emotion && variant !== 'console'" class="emo" :title="emotion.ru">{{ emotion.emoji }}</span>
@@ -45,8 +52,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import type { Message } from '@shared/types'
+import { useSettingsStore } from '@shared/stores/settingsStore'
 import { renderMarkdown } from '@shared/services/markdown'
 import { EMOTIONS } from '@shared/services/emotion'
 import { safeHttpUrl } from '@shared/services/webSearch'
@@ -60,6 +68,15 @@ const emit = defineEmits<{ (e: 'open-image', url: string, caption?: string): voi
 const openImage = () => {
   const url = props.message.imageUrl
   if (url) emit('open-image', url, props.message.imageAlt)
+}
+
+const settings = useSettingsStore()
+const switched = ref(false)
+/** Кнопки исправления: сообщение могло прийти с диска, поэтому берём только известные значения */
+const fixes = computed(() => (props.message.fix ?? []).filter((f) => f === 'use-ollama'))
+const useOllama = () => {
+  settings.settings.provider = 'ollama' // настройки синхронизируются между окнами сами
+  switched.value = true
 }
 
 // computed кэширует результат: при стриминге пересчитывается только пузырь, который меняется
@@ -131,10 +148,24 @@ const emotion = computed(() => {
   min-width: 0;
 }
 .bubble-row.user .bubble { background: var(--bubble-user); }
+.bubble-row.assistant:not(.error) .bubble { border-color: color-mix(in srgb, var(--accent-purple) 26%, transparent); }
 .bubble-row.error .bubble {
   background: rgba(224, 104, 95, 0.14);
   border-color: rgba(224, 104, 95, 0.45);
 }
+
+.fixes { margin-top: 8px; }
+.fix-btn {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--panel-border);
+  background: var(--hover-bg);
+  color: var(--text-primary);
+  font-size: 12px;
+  cursor: pointer;
+}
+.fix-btn:hover:not(:disabled) { background: var(--active-bg); }
+.fix-btn:disabled { opacity: 0.7; cursor: default; }
 
 .bubble-text {
   color: var(--text-primary);

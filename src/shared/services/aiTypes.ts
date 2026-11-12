@@ -1,5 +1,5 @@
 // src/shared/services/aiTypes.ts
-import type { ChatMessage, ProviderId } from '@shared/types'
+import type { ChatMessage, ErrorFix, ProviderId } from '@shared/types'
 import { CLOUD_PRESETS, isCloudProvider } from './providers'
 
 export interface GenerateOptions {
@@ -55,6 +55,24 @@ export function isContextError(e: unknown): boolean {
   )
 }
 
+/** Браузер точно знает, что сети нет (true — отсутствие Wi-Fi/кабеля; «онлайн, но сервер недоступен» отсюда не видно) */
+const isOffline = () => typeof navigator !== 'undefined' && navigator.onLine === false
+
+/**
+ * Какие кнопки показать под сообщением об ошибке. Для облака, когда проблема не в запросе, а в доступе
+ * (нет сети, сервер лёг, ключ не принят, кончились деньги/лимит), — «переключиться на локальную Ollama».
+ * Для «своего сервера» не предлагаем: это обычно и есть локальная программа.
+ */
+export function errorFixes(e: unknown, ctx: { provider: string }): ErrorFix[] {
+  if (!isCloudProvider(ctx.provider) || ctx.provider === 'custom' || !(e instanceof AIError)) return []
+  if (e.kind === 'network' || e.kind === 'timeout') return ['use-ollama']
+  if (e.kind === 'http' && !isContextError(e)) {
+    const st = e.status
+    if (st === 401 || st === 402 || st === 403 || st === 429 || (st !== undefined && st >= 500)) return ['use-ollama']
+  }
+  return []
+}
+
 /** Человеческое сообщение об ошибке для чата. Текст никогда не содержит API-ключа. */
 export function humanizeError(e: unknown, ctx: { provider: string; model?: string; endpoint?: string }): string {
   const preset = isCloudProvider(ctx.provider) ? CLOUD_PRESETS[ctx.provider] : null
@@ -70,7 +88,9 @@ export function humanizeError(e: unknown, ctx: { provider: string; model?: strin
         ? `Не могу достучаться до Ollama (${ctx.endpoint ?? 'localhost:11434'}). Она запущена? Попробуй команду «ollama serve».`
         : ctx.provider === 'custom'
           ? `Не могу достучаться до своего сервера (${ctx.endpoint ?? 'адрес не указан'}). Он запущен? Проверь адрес в настройках («Система»).`
-          : `Не могу достучаться до ${name}. Проверь интернет и адрес API.`
+          : isOffline()
+            ? `Нет интернета, поэтому ${name} недоступен. Проверь подключение или переключись на локальную Ollama — она работает без сети.`
+            : `Нет доступа к ${name}. Проверь интернет (а также VPN и файрвол) или переключись на локальную Ollama — она работает без сети.`
     }
     if (e.kind === 'http') {
       if (e.status === 404 && ctx.provider === 'ollama') {
@@ -90,7 +110,7 @@ export function humanizeError(e: unknown, ctx: { provider: string; model?: strin
       if (e.status === 402) return `На счёте ${name} закончились деньги (402).`
       if (e.status === 429) return `${name}: слишком много запросов или исчерпан лимит (429). Подожди немного и повтори.`
       if (e.status === 529 || (e.status !== undefined && e.status >= 500)) {
-        return `${name} сейчас перегружен или недоступен (${e.status}). Повтори чуть позже.`
+        return `${name} сейчас перегружен или недоступен (${e.status}). Повтори чуть позже или переключись на локальную Ollama.`
       }
       return `Сервер ответил ошибкой ${e.status ?? ''}: ${e.message}`.trim()
     }

@@ -1,13 +1,18 @@
+<p align="center">
+  <img src="public/icons/neko.png" width="112" alt="NEKO AI icon">
+</p>
+
 # NEKO · ARIA — a desktop AI companion
 
 [Русский](README.md) · [Setup](SETUP.en.md) · [Privacy](PRIVACY.md) · [Contributing](CONTRIBUTING.md)
 
-Two assistants in one project. They run on your computer; the LLM can be local (Ollama) or a cloud provider — your choice.
+Two assistants in one app, and both live on your own computer. You can run the language model locally with Ollama, in which case nothing goes to the internet, or plug in a cloud provider with an API key.
 
-- **NEKO** — an anime-style companion with a 3D (VRM) avatar on your desktop: chats, changes emotions, lip-syncs to speech, keeps a personal **diary** and remembers past conversations.
-- **ARIA** — a Jarvis-style voice assistant: a compact window with an animated "lens" (or an avatar if you add `aria.vrm`) and a status panel — link, model, time to first token, context usage. The numbers are computed locally and never sent anywhere.
+**NEKO** is an anime-style companion with a 3D (VRM) avatar right on your desktop. She chats with you, changes her expression, moves her lips to her own speech, keeps a personal diary and remembers what you talked about before.
 
-> **Version 0.1 — early.** A personal project that keeps evolving; things may break, please open an issue. What was and was not verified is stated honestly in [SETUP.en.md](SETUP.en.md).
+**ARIA** is a Jarvis-style voice assistant: a small window with an animated "lens" (or an avatar, if you drop in an `aria.vrm`) and a status panel showing the connection, the model, how long the first word took and how full the context is. Those numbers are worked out on your machine and never leave it.
+
+> **Version 0.1.x is early.** I build this for myself and keep tinkering with it, so some things may not behave the way they should. If you spot something, please open an issue. What I have and haven't actually tested is written down honestly in [SETUP.en.md](SETUP.en.md).
 
 | NEKO | ARIA |
 | --- | --- |
@@ -15,53 +20,55 @@ Two assistants in one project. They run on your computer; the LLM can be local (
 | ![Chat](docs/screenshots/chat.png) | ![Settings](docs/screenshots/settings.png) |
 | ![Diary](docs/screenshots/diary.png) | ![Diary PDF export](docs/screenshots/diary-pdf.png) |
 
-## Features
+## What it can do
 
-**LLMs** — local **Ollama** (nothing leaves your PC) or cloud (key required): DeepSeek, OpenAI, Anthropic, Google Gemini, OpenRouter, Groq, Mistral, Together, xAI and any OpenAI-compatible server. Streaming replies, per-day conversation memory, recall of past chats.
+**Language models.** Local: Ollama. Cloud (you need a key): DeepSeek, OpenAI, Anthropic, Google Gemini, OpenRouter, Groq, Mistral, Together, xAI, or any OpenAI-compatible server. Replies stream in as they are written, conversations are remembered day by day, and when you ask something like "remember when we talked about…" she looks through your past chats.
 
-**Voice** — input: local **Whisper** (OpenAI-compatible server) or built-in recognition. Output: built-in voice, **Chatterbox** (local), **ElevenLabs** and **Cartesia** (cloud). Separate voices for NEKO and ARIA. Lip-sync.
+**Voice.** You can talk to her through a local Whisper server or the built-in recognition. She answers with the built-in voice, Chatterbox (local), ElevenLabs or Cartesia (cloud). NEKO and ARIA have different voices, and the avatar's lips follow the speech.
 
-**Avatar (NEKO)** — VRM model in a transparent always-on-top window, emotions, blinking, gaze. `.vrma` animations: after each one the avatar returns to a neutral pose and rests for a configurable time.
+**NEKO's avatar.** A VRM model in a transparent window on top of your desktop, with emotions, blinking and gaze. The `.vrma` animations don't fire constantly: after each one the avatar goes back to a calm pose and rests for a while (you can set how long).
 
-**Diary (NEKO)** — entries, mood, emotion statistics, pictures; **search by emotion** ("when was I sad", in Russian) and **export** to Markdown and PDF.
+**NEKO's diary.** Entries, mood, emotion statistics, pictures. You can search by feeling: "when was I sad" (in Russian for now) works in the diary and in the chat. Entries export to Markdown and PDF.
 
-**Chat commands** — reminders (popup; the parser understands Russian only), calculator, weather, translation, news, facts, web search and Wikipedia (can be switched off), image generation via Stable Diffusion.
+**Chat commands.** Reminders ("remind me in 10 minutes to drink water" — the parser only understands Russian so far), a calculator, weather, translation, news, facts, web search and Wikipedia (both can be switched off), and images via Stable Diffusion.
 
-**Convenience** — double-click `NEKO.bat` / `ARIA.bat` (Windows), desktop shortcuts via `npm run shortcuts`, tray icon (closing the window does not quit the app, configurable), a first-run "Check and install" wizard, optional autostart with Windows.
+**Small things that make life easier.** Double-click `NEKO.bat` or `ARIA.bat` and everything starts. There's a tray icon, and closing the window doesn't quit the app (you can change that). On first launch a "Check and install" wizard opens, looks at what already works and what's missing and tells you where to get it, with a "Download sample VRM" button right there. If the cloud can't be reached the app says so plainly — "No access to OpenAI, check your internet or switch to local Ollama" — and offers a button to switch. There's also optional autostart with Windows.
 
 ## Quick start
 
-You need [Node.js](https://nodejs.org) 18+ and some LLM.
+**If you'd rather not deal with Node.js,** open the **Releases** page on GitHub: it has ready-made Windows installers, `NEKO-Setup-….exe` and `ARIA-Setup-….exe`. They aren't code-signed, so SmartScreen may frown at them (that's expected; SETUP.en.md explains how to get past it), and the checksums sit next to them. Get the avatar model with the button in *Settings → Check and install*.
+
+**From source** you need [Node.js](https://nodejs.org) 18 or newer and some language model.
 
 ```bash
 git clone <repository URL>
 cd <project folder>
 ```
 
-1. Install [Ollama](https://ollama.com/download) and pull a model (`ollama pull gemma4:e4b`) — or get a cloud provider key.
-2. Put a VRM model at `public/models/default.vrm` (see [public/models/README.md](public/models/README.md)).
-3. Windows: double-click `NEKO.bat` or `ARIA.bat`. Other systems: `npm install`, then `npm run start:neko` / `npm run start:aria`.
+1. Install [Ollama](https://ollama.com/download) and pull a model (`ollama pull gemma4:e4b`), or get a key from a cloud provider.
+2. Avatar: press "Download sample VRM" in *Settings → Check and install*, or put your own `.vrm` into the models folder (details in [public/models/README.md](public/models/README.md)).
+3. On Windows, double-click `NEKO.bat` or `ARIA.bat`. On other systems: `npm install`, then `npm run start:neko` or `npm run start:aria`.
 
-Details, including voice and images: **[SETUP.en.md](SETUP.en.md)**.
+Voice, images and everything else: **[SETUP.en.md](SETUP.en.md)**.
 
 ## For developers
 
-Electron 29 · Vue 3.5 · Pinia · Vite 5 · TypeScript · three.js + `@pixiv/three-vrm`.
+Electron 29, Vue 3.5, Pinia, Vite 5, TypeScript, three.js and `@pixiv/three-vrm`.
 
 ```bash
 npm run dev:neko        # development (or dev:aria)
 npm run typecheck
 npm run build:electron
 npm run build:neko      # Windows installer in release/
-npm run check:publish   # pre-publish scan: keys, personal data, stray files
+npm run check:publish   # before publishing: looks for keys, personal data and stray files
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for pull requests and [SECURITY.md](SECURITY.md) for vulnerabilities.
+Pull requests are described in [CONTRIBUTING.md](CONTRIBUTING.md), vulnerabilities in [SECURITY.md](SECURITY.md).
 
 ## Privacy
 
-No telemetry. Data stays in the app folder on your computer; only what you enable (cloud LLM, cloud TTS) or request (weather, translation, news, search) goes over the network. **API keys are stored unencrypted** — never publish the data folder or screenshots of the settings. Full list: [PRIVACY.md](PRIVACY.md).
+There is no telemetry. Everything the app stores lives in its own folder on your computer. Only what you switch on (a cloud model, cloud voice) or ask for (weather, translation, news, search) goes over the network. One thing to remember: **API keys are stored unencrypted**, so never publish the data folder or screenshots of the settings. The full list is in [PRIVACY.md](PRIVACY.md).
 
 ## License
 
-Code: [MIT](LICENSE). VRM models, animations and voices are not part of the repository and have their own licenses.
+The code is under the [MIT](LICENSE) license. VRM models, animations and voices are not part of this repository; each has its own author and its own license.

@@ -6,8 +6,8 @@
 
 ## Русский
 
-**Коротко:** приложение работает на твоём компьютере. В нём нет телеметрии, аналитики, отчётов об ошибках и автообновления.
-Данные уходят в интернет только туда, куда ты сам их направил настройками (облачная нейросеть, облачная озвучка) или командами (погода, перевод, новости, поиск).
+**Коротко:** приложение работает на твоём компьютере. Телеметрии, аналитики, отчётов об ошибках и автообновления в нём нет.
+Данные уходят в интернет только туда, куда ты сам их направил: настройками (облачная нейросеть, облачная озвучка) или командами в чате (погода, перевод, новости, поиск).
 
 ### Где лежат твои данные
 
@@ -27,6 +27,7 @@
 | Дневник NEKO | `diary\diary.json` (+ `.bak`) | мысли, настроение, статистика эмоций |
 | Картинки дневника | `diary\images\` | селфи, иллюстрации и твои фото |
 | **Настройки и API-ключи** | `Local Storage\` (хранилище браузерного движка внутри папки данных) | ⚠️ **ключи лежат в открытом виде**, без шифрования |
+| Модели и анимации | `models\`, `animations\` | только то, что ты сам скачал кнопкой или положил |
 | Напоминания | `reminders.json` | ожидающие и не закрытые |
 | Позиции окон | `window-state.json` | |
 | Трей | `app-prefs.json` | два переключателя |
@@ -53,6 +54,7 @@
 | Перевод | `api.mymemory.translated.net` | переводимый текст |
 | Новости | `news.google.com` (RSS) | запрос на ленту новостей |
 | «Интернет» (Википедия, поиск) | `ru.wikipedia.org`, `en.wikipedia.org`, `html.duckduckgo.com` | поисковые слова из твоего вопроса; выключатель — «Настройки → Интернет → Разрешить доступ в интернет» (поиск идёт по просьбе или сам, если включено «Искать самой») |
+| Кнопка «Скачать образец VRM» | `raw.githubusercontent.com` (репозиторий pixiv/three-vrm) | обычный запрос HTTPS — только по нажатию кнопки; серверу виден твой IP |
 | Напоминания, калькулятор, факты, дневник, воспоминания | — | ничего: всё считается на компьютере |
 
 Дополнительно:
@@ -72,8 +74,8 @@ API-ключи, всё содержимое папки данных (особе�
 
 ## English
 
-**In short:** the app runs on your computer. It contains no telemetry, analytics, crash reporting or auto-update.
-Data leaves your machine only where you point it (a cloud LLM, cloud TTS) or when you ask for it (weather, translation, news, web search).
+**In short:** the app runs on your computer. It has no telemetry, no analytics, no crash reporting and no auto-update.
+Data only leaves your machine where you send it yourself: through settings (a cloud model, cloud voice) or by asking in the chat (weather, translation, news, web search).
 
 ### Where your data lives
 
@@ -101,6 +103,7 @@ PDF export writes a temporary file to the system `Temp` folder and deletes it ri
 | Translation | MyMemory | the text to translate |
 | News | Google News RSS | a feed request |
 | Web ("Internet" plugin) | Wikipedia, DuckDuckGo HTML | search words from your question (switch: Settings → Internet; weather, translation and news are on-request and not covered by that switch) |
+| "Download sample VRM" button | `raw.githubusercontent.com` (pixiv/three-vrm) | a plain HTTPS request, only when you press the button; the server sees your IP |
 | Reminders, calculator, facts, diary, recall | — | nothing |
 
 Any custom address you type in settings receives the data listed for that feature. Cloud providers apply their own retention and training policies. For private voice input choose local Whisper.

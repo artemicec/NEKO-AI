@@ -255,7 +255,7 @@ figcaption { margin-top: 8px; display: flex; flex-direction: column; gap: 2px; m
   font-family: 'Segoe Print', 'Bradley Hand', 'Segoe UI', cursive;
   font-size: 12px;
   border: none;
-  border-bottom: 1px solid #9b7bb8;
+  border-bottom: 1px solid var(--accent-purple);
   background: transparent;
   outline: none;
   color: #2a2438;

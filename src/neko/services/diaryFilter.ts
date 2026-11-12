@@ -4,7 +4,7 @@
 // Эмоции запроса можно выбрать «чипами» или написать словами: «когда мне было грустно» → чип «грусть» + пустая тема.
 
 import type { DiaryEntry, EmotionLabel } from '@shared/types'
-import { emotionScore, parseEmotionQuery } from '@shared/services/emotionQuery'
+import { emotionScore, parseEmotionQuery, preferStrong } from '@shared/services/emotionQuery'
 import { topicWords } from '@shared/services/memoryRecall'
 
 export { emotionScore }
@@ -68,7 +68,9 @@ export function filterDiary(entries: DiaryEntry[], f: DiaryFilter): DiaryEntry[]
   }
   // при выборе по эмоции — сначала самые «про это»; иначе порядок как был (по дате)
   if (f.emotions.length || fromQuery.length) out.sort((a, b) => b.score - a.score) // sort устойчивый: при равенстве остаётся порядок по дате
-  return out.map((x) => x.e)
+  // «очень грустно» — сначала только яркие записи (если таких нет, показываем все подходящие)
+  const shown = fromQuery.length ? preferStrong(out, (x) => x.score, !!parsed?.intense) : out
+  return shown.map((x) => x.e)
 }
 
 /** Для «чипов»: по каждой эмоции — в скольких записях она главная или заметная (score > 0). Только ненулевые, по убыванию */

@@ -103,7 +103,7 @@ export class VRMService {
     main.position.set(2, 3, 4)
     this.scene.add(main)
 
-    const fill = new THREE.DirectionalLight(opts.fillColor ?? 0x9b7bb8, 0.4)
+    const fill = new THREE.DirectionalLight(opts.fillColor ?? 0x8b95ff, 0.4)
     fill.position.set(-2, 1, -2)
     this.scene.add(fill)
 
@@ -151,6 +151,8 @@ export class VRMService {
       if (this.currentModel) this.disposeModel()
 
       this.mouthApplied = [0, 0, 0, 0, 0] // у новой модели рот в нуле
+      this.mouth.reset() // и фильтр сглаживания тоже: он помнит рот прежней модели
+      this.lastMouthActiveAt = -Infinity
       this.currentModel = vrm
       this.scene.add(vrm.scene)
       vrm.scene.position.set(0, 0, 0)
