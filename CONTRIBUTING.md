@@ -50,16 +50,6 @@ npm run build:electron  # сборка главного процесса (tsc)
 API-ключи, файлы из папки данных приложения (`userData`), `.vrm`/`.vrma` (лицензии моделей), скриншоты с личной перепиской или ключами в кадре.
 Перед PR можно запустить `npm run check:publish` — скрипт ищет типичные утечки.
 
-### Выпуск версии (для владельца репозитория)
-
-1. Подними `version` в `package.json` (например, `0.1.2`), закоммить вместе с `package-lock.json`.
-2. Создай тег и отправь его: `git tag v0.1.2` → `git push origin v0.1.2`.
-3. Workflow **Release** (`.github/workflows/release.yml`) соберёт установщики `NEKO-Setup-0.1.2.exe` и `ARIA-Setup-0.1.2.exe`, посчитает `SHA256SUMS.txt` и создаст релиз.
-   Тег должен совпадать с `version` (`v0.1.2`; допустимо `v0.1.2-rc1` — это предварительный релиз), иначе сборка остановится с понятной ошибкой.
-4. Проверить сборку без релиза: Actions → Release → Run workflow — файлы появятся в «Artifacts».
-
-Установщики не подписаны (сертификата нет) и без VRM-модели — это сказано в тексте релиза.
-
 ### Уязвимости
 
 О найденной уязвимости сообщай **приватно** (см. [SECURITY.md](SECURITY.md)), а не в публичном issue.
@@ -105,12 +95,6 @@ The same goes for settings (`sanitizeSettings` in `settingsStore.ts`): new field
 
 API keys, anything from the app's `userData` folder, `.vrm`/`.vrma` files (model licenses), screenshots showing private chats or keys.
 `npm run check:publish` scans for common leaks.
-
-### Releasing (maintainers)
-
-1. Bump `version` in `package.json` and commit it together with `package-lock.json`.
-2. `git tag v0.1.2 && git push origin v0.1.2`.
-3. The **Release** workflow builds `NEKO-Setup-0.1.2.exe` and `ARIA-Setup-0.1.2.exe`, writes `SHA256SUMS.txt` and creates the GitHub release. The tag must match `version` (`v0.1.2-rc1` makes a prerelease). To test without releasing: Actions → Release → Run workflow (files appear under "Artifacts").
 
 The installers are unsigned and contain no VRM model; the release notes say so.
 
