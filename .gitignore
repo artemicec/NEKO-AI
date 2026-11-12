@@ -25,6 +25,8 @@ reminders.json
 app-prefs.json
 window-state*.json
 settings*.json
+.vs/
+stable-diffusion-webui/
 
 # ───────────────────────── Секреты ─────────────────────────
 .env

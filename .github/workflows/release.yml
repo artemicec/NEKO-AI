@@ -1,0 +1,108 @@
+name: Release
+
+# Тег вида v0.1.1 → собираются установщики Windows (.exe) для NEKO и ARIA и прикладываются к релизу на GitHub.
+# Запуск вручную (Actions → Release → Run workflow) собирает те же файлы, но релиз не создаёт — они лежат в «Artifacts» прогона.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Installer (${{ matrix.app }})
+    runs-on: windows-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: true
+      matrix:
+        app: [neko, aria]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # Версия в имени установщика берётся из package.json — тег обязан с ней совпадать, иначе выйдет «v0.1.2» с файлом 0.1.1
+      - name: Tag matches package.json version
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          if [ "$TAG" != "v$VERSION" ] && [[ "$TAG" != "v$VERSION-"* ]]; then
+            echo "::error::Тег $TAG не совпадает с версией в package.json ($VERSION). Поправь version, закоммить и создай тег заново."
+            exit 1
+          fi
+
+      # Нужен package-lock.json (его надо коммитить): сборка релиза должна ставить ровно те версии, что проверены
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      # --publish never: electron-builder сам ничего не публикует, файлы выкладывает следующий job
+      - name: Build installer
+        run: npm run build:${{ matrix.app }} -- --publish never
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installer-${{ matrix.app }}
+          path: release/*.exe
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish GitHub release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write # создать релиз и приложить файлы
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist-installers
+          pattern: installer-*
+          merge-multiple: true
+
+      - name: Checksums
+        working-directory: dist-installers
+        run: sha256sum *.exe | tee SHA256SUMS.txt
+
+      - name: Create or update release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+        working-directory: dist-installers
+        run: |
+          cat > notes.md <<'NOTES'
+          **Как поставить.** Скачай `NEKO-Setup-….exe` (компаньон с аватаром) или `ARIA-Setup-….exe` (голосовой помощник) и запусти — Node.js для этого не нужен.
+
+          Три вещи, о которых лучше знать заранее:
+
+          - Установщик не подписан сертификатом, поэтому Windows SmartScreen может предупредить. Это нормально: нажми «Подробнее», затем «Выполнить в любом случае». Контрольные суммы лежат в `SHA256SUMS.txt`, если хочешь сверить файл.
+          - Модели аватара (VRM) в установщике нет: у каждой модели своя лицензия, и я не хочу раздавать чужое. Откроешь «Настройки → Проверка и установка» — там кнопка «Скачать образец VRM» и кнопка «Папка моделей», если у тебя есть своя `.vrm`.
+          - Нужна нейросеть: либо [Ollama](https://ollama.com/download) на твоём компьютере, либо ключ облачного провайдера. Всё подробно расписано в [SETUP.md](https://github.com/__REPO__/blob/__TAG__/SETUP.md).
+          NOTES
+          # имя тега подставляем средствами bash (из env), а не выражением GitHub прямо в скрипт
+          BODY="$(cat notes.md)"; BODY="${BODY//__TAG__/$TAG}"; BODY="${BODY//__REPO__/$REPO}"; printf '%s\n' "$BODY" > notes.md
+          # «-rc», «-beta» и т.п. в теге — предварительный релиз
+          PRE=""; case "$TAG" in *-*) PRE="--prerelease";; esac
+          if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+            gh release upload "$TAG" *.exe SHA256SUMS.txt --repo "$REPO" --clobber
+          else
+            gh release create "$TAG" *.exe SHA256SUMS.txt --repo "$REPO" --title "$TAG" --notes-file notes.md --generate-notes $PRE
+          fi
