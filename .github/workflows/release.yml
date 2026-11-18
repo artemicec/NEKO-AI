@@ -55,7 +55,7 @@ jobs:
       - name: Build installer
         run: npm run build:${{ matrix.app }} -- --publish never
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: installer-${{ matrix.app }}
           path: release/*.exe
